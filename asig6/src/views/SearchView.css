@@ -1,0 +1,116 @@
+/* src/views/SearchView.css */
+
+.search-view {
+  padding: 2rem;
+  background-color: #111;
+  color: #fff;
+  min-height: 100vh;
+}
+
+.main-layout {
+  display: flex;
+}
+
+.sidebar {
+  width: 200px;
+  margin-right: 2rem;
+}
+
+.content-area {
+  flex-grow: 1;
+}
+
+.content-area h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #eee;
+}
+
+.movie-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.movie-card {
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  width: 200px;
+  text-align: center;
+  text-decoration: none;
+  color: #fff;
+  padding: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+}
+
+.movie-card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.movie-card p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.no-poster {
+  width: 100%;
+  height: 300px;
+  background: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+/* Optional: basic search bar styling if it's inside Header */
+.search-bar input {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 20px;
+  font-size: 1rem;
+  width: 250px;
+  max-width: 100%;
+}
+
+.search-bar input:focus {
+  outline: none;
+  box-shadow: 0 0 5px #0f0;
+}
+
+.pagination-controls {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pagination-controls button {
+  padding: 0.5rem 1rem;
+  background-color: #222;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  background-color: #333;
+}
+
+.pagination-controls button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

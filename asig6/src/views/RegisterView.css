@@ -1,0 +1,85 @@
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.register-view {
+  background: linear-gradient(135deg, #1a2a6c, #700000, #11138a);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.register-view form {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.register-view h2 {
+  text-align: center;
+  color: #333;
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.register-view input {
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.register-view input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.register-view button {
+  padding: 12px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.register-view button:hover {
+  background-color: #28a745;
+}
+
+.genre-checkboxes {
+  margin-top: 10px;
+  background: #f9f9f9;
+  border: 1px solid #aaa;
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.genre-checkboxes label {
+  display: block;
+  margin-bottom: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}

@@ -1,0 +1,33 @@
+.genre-view {
+  padding: 20px;
+}
+
+.movie-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.movie-card {
+  width: 200px;
+  text-align: center;
+}
+
+.pagination-controls {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.pagination-controls button {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.pagination-controls button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
