@@ -6,8 +6,11 @@ import Genres from "../components/Genres";
 import "./GenreView.css";
 import axios from "axios";
 import { CartContext } from "../context/CartContext";
+import { UserContext } from "../context/UserContext";
+
 
 const GenreView = () => {
+  const { user } = useContext(UserContext);
   const { id } = useParams();
   const [movies, setMovies] = useState([]);
   const [page, setPage] = useState(1);
@@ -69,18 +72,19 @@ const GenreView = () => {
                     <strong>{movie.title}</strong>
                   </p>
                 </Link>
-                {isInCart(movie.id) ? (
-                  <button disabled className="cart-button added">
-                    Added to Cart
-                  </button>
-                ) : (
-                  <button
-                    className="cart-button"
-                    onClick={() => addToCart(movie)}
-                  >
-                    Add to Cart
-                  </button>
-                )}
+                {user.loggedIn &&
+                  (isInCart(movie.id) ? (
+                    <button disabled className="cart-button added">
+                      Added to Cart
+                    </button>
+                  ) : (
+                    <button
+                      className="cart-button"
+                      onClick={() => addToCart(movie)}
+                    >
+                      Add to Cart
+                    </button>
+                  ))}
               </div>
             ))}
           </div>

@@ -1,56 +1,104 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useContext, useState, useEffect } from 'react';
+import './SettingsView.css';
+import { UserContext } from '../context/UserContext';
 import axios from 'axios';
-import './SearchView.css';
+import { useNavigate } from 'react-router-dom';
 
-const SearchView = () => {
-  const [searchParams] = useSearchParams();
-  const query = searchParams.get('query');
-  const [results, setResults] = useState([]);
+const SettingsView = () => {
+  const { user, setUser } = useContext(UserContext);
+  const [firstName, setFirstName] = useState(user.firstName);
+  const [lastName, setLastName] = useState(user.lastName);
+  const [selectedGenres, setSelectedGenres] = useState(user.genres || []);
+  const [genres, setGenres] = useState([]);
+
+  const navigate = useNavigate();
+
+  const allowedGenreIds = [28, 80, 36, 878, 12, 10751, 27, 10752, 16, 14, 9648, 37];
 
   useEffect(() => {
-    const fetchResults = async () => {
+    const fetchGenres = async () => {
       try {
-        const response = await axios.get(`https://api.themoviedb.org/3/search/movie`, {
+        const res = await axios.get('https://api.themoviedb.org/3/genre/movie/list', {
           params: {
             api_key: import.meta.env.VITE_TMDB_API_KEY,
-            query: query,
-            include_adult: false,
             language: 'en-US',
-            page: 1,
-          }
+          },
         });
-        setResults(response.data.results || []);
-      } catch (error) {
-        console.error('Search failed:', error);
+        const filtered = res.data.genres.filter(g => allowedGenreIds.includes(g.id));
+        setGenres(filtered);
+      } catch (err) {
+        alert('Failed to load genres');
       }
     };
+    fetchGenres();
+  }, []);
 
-    if (query) {
-      fetchResults();
+  const handleGenreChange = (id) => {
+    setSelectedGenres(prev =>
+      prev.includes(id) ? prev.filter(g => g !== id) : [...prev, id]
+    );
+  };
+
+  const handleSave = () => {
+    if (selectedGenres.length < 5) {
+      alert('Please select at least 5 genres.');
+      return;
     }
-  }, [query]);
+
+    setUser(prev => ({
+      ...prev,
+      firstName,
+      lastName,
+      genres: selectedGenres
+    }));
+
+    alert('Settings updated successfully!');
+  };
+  const handleBack = () => {
+    const genreId = selectedGenres.length > 0 ? selectedGenres[0] : 28;
+    navigate(`/genre/${genreId}`);
+  };
+  
 
   return (
-    <div className="search-view">
-      <h2>Search Results for "{query}"</h2>
-      {results.length > 0 ? (
-        <div className="results-grid">
-          {results.map((movie) => (
-            <div key={movie.id} className="movie-card">
-              <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
+    <div className="settings-view">
+      <div className="settings-form">
+        <h2>User Settings</h2>
+        <p><strong>Email:</strong> {user.email}</p>
+
+        <input
+          type="text"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          placeholder="First Name"
+        />
+        <input
+          type="text"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          placeholder="Last Name"
+        />
+
+        <div className="genre-checkboxes">
+          <p>Update your favorite genres (select at least 5):</p>
+          {genres.map((genre) => (
+            <label key={genre.id}>
+              <input
+                type="checkbox"
+                value={genre.id}
+                checked={selectedGenres.includes(genre.id)}
+                onChange={() => handleGenreChange(genre.id)}
               />
-              <h3>{movie.title}</h3>
-            </div>
+              {genre.name}
+            </label>
           ))}
         </div>
-      ) : (
-        <p>No results found.</p>
-      )}
+
+        <button onClick={handleSave}>Save Changes</button>
+        <button onClick={handleBack} className="back-button">Back to Genres</button>
+      </div>
     </div>
   );
 };
 
-export default SearchView;
+export default SettingsView;

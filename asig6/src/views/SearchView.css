@@ -114,3 +114,8 @@
   opacity: 0.5;
   cursor: default;
 }
+.pagination-controls span {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ccc;
+}

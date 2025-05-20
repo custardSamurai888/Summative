@@ -6,6 +6,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Genres from "../components/Genres";
 import { CartContext } from "../context/CartContext";
+import { UserContext } from "../context/UserContext";
 import "./SearchView.css";
 
 const SearchView = () => {
@@ -16,10 +17,27 @@ const SearchView = () => {
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const { addToCart, removeFromCart, isInCart } = useContext(CartContext);
+  const { addToCart, isInCart } = useContext(CartContext);
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
-    if (!query.trim()) return;
+    if (!query || query.trim() === "") {
+      return (
+        <div className="search-view">
+          <Header />
+          <div className="main-layout">
+            <aside className="sidebar">
+              <Genres />
+            </aside>
+            <div className="content-area">
+              <p className="error">Please enter a valid search query.</p>
+            </div>
+          </div>
+          <Footer />
+        </div>
+      );
+    }
+    
 
     const fetchResults = async () => {
       try {
@@ -38,7 +56,7 @@ const SearchView = () => {
           }
         );
         setResults(response.data.results || []);
-        setTotalPages(Math.min(response.data.total_pages || 1, 10)); // limit pages for UI control
+        setTotalPages(Math.min(response.data.total_pages || 1, 10));
         setError("");
       } catch (err) {
         console.error("Search failed:", err);
@@ -50,7 +68,7 @@ const SearchView = () => {
   }, [query, page]);
 
   useEffect(() => {
-    setPage(1); // reset to first page on new search
+    setPage(1);
   }, [query]);
 
   const handlePrev = () => {
@@ -64,7 +82,6 @@ const SearchView = () => {
   return (
     <div className="search-view">
       <Header />
-
       <div className="main-layout">
         <aside className="sidebar">
           <Genres />
@@ -89,43 +106,40 @@ const SearchView = () => {
                     ) : (
                       <div className="no-poster">No Poster</div>
                     )}
-                    <p>
-                      <strong>{movie.title || "Untitled"}</strong>
-                    </p>
+                    <p><strong>{movie.title || "Untitled"}</strong></p>
                   </Link>
 
-                  {isInCart(movie.id) ? (
-                    <button className="cart-button added" disabled>
-                      Added to Cart
-                    </button>
-                  ) : (
-                    <button
-                      className="cart-button"
-                      onClick={() => addToCart(movie)}
-                    >
-                      Add to Cart
-                    </button>
+                  {/* Add to Cart only if user is logged in */}
+                  {user?.loggedIn && (
+                    isInCart(movie.id) ? (
+                      <button disabled className="cart-button added">
+                        Added to Cart
+                      </button>
+                    ) : (
+                      <button
+                        className="cart-button"
+                        onClick={() => addToCart(movie)}
+                      >
+                        Add to Cart
+                      </button>
+                    )
                   )}
                 </div>
               ))
             )}
           </div>
 
-          {/* Pagination Controls */}
           <div className="pagination-controls">
             <button onClick={handlePrev} disabled={page === 1}>
               Previous
             </button>
-            <span>
-              Page {page} of {totalPages}
-            </span>
+            <span>Page {page} of {totalPages}</span>
             <button onClick={handleNext} disabled={page === totalPages}>
               Next
             </button>
           </div>
         </div>
       </div>
-
       <Footer />
     </div>
   );

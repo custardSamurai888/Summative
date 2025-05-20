@@ -12,7 +12,8 @@ const RegisterView = () => {
   const [rePassword, setRePassword] = useState('');
   const [genres, setGenres] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
-  const { register } = useContext(UserContext);  // use register function
+
+  const { register } = useContext(UserContext);
   const navigate = useNavigate();
 
   const allowedGenreIds = [28, 80, 36, 878, 12, 10751, 27, 10752, 16, 14, 9648, 37];
@@ -57,7 +58,6 @@ const RegisterView = () => {
       return;
     }
 
-    // Use register function to update context with full user data
     register({
       firstName,
       lastName,
