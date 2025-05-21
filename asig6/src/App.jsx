@@ -8,9 +8,9 @@ import MovieDetailView from './views/MovieDetailView';
 import ErrorView from './views/ErrorView';
 import SettingsView from './views/SettingsView';
 import SearchView from './views/SearchView';
-import CartView from './views/CartView'; // Add this import
+import CartView from './views/CartView'; 
 import { UserProvider } from './context/UserContext';
-import { CartProvider } from './context/CartContext'; // Add CartProvider
+import { CartProvider } from './context/CartContext'; 
 
 function App() {
   return (

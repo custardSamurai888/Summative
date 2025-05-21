@@ -36,7 +36,7 @@ const CartView = () => {
           </div>
         )}
 
-        {/* ✅ Back to Genres Button */}
+        {/*Back to Genres Button */}
         <button
           className="back-button"
           onClick={() => navigate("/")}

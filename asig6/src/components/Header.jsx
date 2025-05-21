@@ -88,36 +88,34 @@ const Header = () => {
         <>
           <h1 className="welcome-heading">Hello, {getGreetingName()}!</h1>
 
-          {user.loggedIn && (
-            <div className="search-form" ref={suggestionsRef}>
-              <form onSubmit={handleSearch}>
-                <input
-                  type="text"
-                  placeholder="Search movies..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button type="submit">Search</button>
-              </form>
+          <div className="search-form" ref={suggestionsRef}>
+            <form onSubmit={handleSearch}>
+              <input
+                type="text"
+                placeholder="Search movies..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button type="submit">Search</button>
+            </form>
 
-              {suggestions.length > 0 && (
-                <ul className="suggestions-dropdown">
-                  {suggestions.map((movie) => (
-                    <li
-                      key={movie.id}
-                      onClick={() => {
-                        navigate(`/movie/${movie.id}`);
-                        setSuggestions([]);
-                        setSearchQuery("");
-                      }}
-                    >
-                      {movie.title}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
+            {suggestions.length > 0 && (
+              <ul className="suggestions-dropdown">
+                {suggestions.map((movie) => (
+                  <li
+                    key={movie.id}
+                    onClick={() => {
+                      navigate(`/movie/${movie.id}`);
+                      setSuggestions([]);
+                      setSearchQuery("");
+                    }}
+                  >
+                    {movie.title}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </>
       )}
 

@@ -1,58 +1,38 @@
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 15px 25px;
-  background-color: rgba(0, 0, 0, 0.829);
-  color: white;
+  justify-content: space-between;
+  background-color: #111;
+  padding: 1rem 2rem;
+  color: #fff;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 10;
 }
 
-.header .logo {
-  font-size: 24px;
-  font-weight: bold;
-  font-family: 'Pacifico', cursive;
-  color: #ffcc00;
-}
-
-.header .auth-buttons {
+.logo-link {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  text-decoration: none;
 }
 
-.header .auth-buttons button {
-  padding: 8px 16px;
-  background-color: #ffcc00;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
+.logo {
+  width: 50px;
+  height: auto;
 }
 
-.header .auth-buttons button:hover {
-  background-color: #e6b800;
-}
-
-.logo{
-  width: 100px;
-  border-radius: 10px;
-}
-
-.header-buttons button {
-  margin-right: 10px; 
-}
-
-.cart-badge {
-  background-color: red;
-  color: white;
-  border-radius: 50%;
-  padding: 0 6px;
-  font-size: 12px;
-  margin-left: 5px;
+.welcome-heading {
+  font-size: 1.2rem;
+  margin: 0 1.5rem;
+  color: #fff;
+  font-weight: 500;
 }
 
 .search-form {
+  flex: 1;
+  max-width: 400px;
+  margin: 0 1rem;
   position: relative;
-  width: 300px;
 }
 
 .search-form form {
@@ -61,45 +41,97 @@
 
 .search-form input {
   flex: 1;
-  padding: 8px;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 4px 0 0 4px;
+  border-radius: 5px 0 0 5px;
+  font-size: 1rem;
 }
 
 .search-form button {
-  padding: 8px 12px;
+  padding: 0.5rem 1rem;
+  background-color: #e50914;
   border: none;
-  background-color: #f39c12;
+  border-radius: 0 5px 5px 0;
   color: #fff;
-  border-radius: 0 4px 4px 0;
+  font-size: 1rem;
   cursor: pointer;
+}
+
+.search-form button:hover {
+  background-color: #b00710;
 }
 
 .suggestions-dropdown {
   position: absolute;
-  top: 100%; /* ⬅️ This pushes it below the input */
+  top: 100%;
   left: 0;
-  right: 0;
-  background-color: #1c1c1c;
-  color: white;
-  list-style: none;
-  margin: 2px 0 0;
-  padding: 0;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(255, 204, 0, 0.2);
-  max-height: 180px; /* ⬅️ Limit height */
+  width: 100%;
+  background-color: #222;
+  border: 1px solid #333;
+  border-top: none;
+  max-height: 200px;
   overflow-y: auto;
-  z-index: 999;
+  z-index: 5;
+  border-radius: 0 0 5px 5px;
 }
 
 .suggestions-dropdown li {
-  padding: 8px 12px;
+  padding: 0.5rem 1rem;
   cursor: pointer;
-  border-bottom: 1px solid #333;
-  font-size: 14px;
-  transition: background 0.2s;
+  color: #eee;
+  transition: background-color 0.2s;
 }
 
 .suggestions-dropdown li:hover {
   background-color: #333;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.header-buttons button {
+  padding: 0.4rem 0.8rem;
+  background-color: #444;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.header-buttons button:hover {
+  background-color: #666;
+}
+
+.cart-badge {
+  background-color: #e50914;
+  color: #fff;
+  border-radius: 50%;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.8rem;
+  margin-left: 5px;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .search-form {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .header-buttons {
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 }
