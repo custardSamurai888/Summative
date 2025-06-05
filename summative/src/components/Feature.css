@@ -1,0 +1,46 @@
+.feature-section {
+  padding: 30px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 12px;
+  margin: 20px;
+  text-align: center;
+}
+
+.feature-section h2 {
+  color: #ffcc00;
+  margin-bottom: 20px;
+}
+
+.feature-movies {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.movie-card {
+  width: 200px;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #fff;
+  color: #000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+}
+
+.movie-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.movie-card p {
+  padding: 10px;
+  font-weight: bold;
+}
