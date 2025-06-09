@@ -15,7 +15,16 @@ const MovieDetailView = () => {
   const [error, setError] = useState(null);
 
   const { addToCart, isInCart } = useContext(CartContext);
-  const { user } = useContext(UserContext); // Get logged-in user
+  const { firebaseUser, purchases } = useContext(UserContext);
+
+  // Helper to check if purchased (by title and release_date)
+  const isPurchased = (movieObj) =>
+    purchases &&
+    purchases.some(
+      (p) =>
+        p.title === movieObj.title &&
+        p.release_date === movieObj.release_date
+    );
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -100,15 +109,24 @@ const MovieDetailView = () => {
             <strong>Overview:</strong> {movie.overview}
           </p>
 
-          {/* Show Add to Cart only if logged in */}
-          {user.loggedIn && (
-            <button
-              className="cart-button"
-              onClick={handleAddToCart}
-              disabled={isInCart(movie.id)}
-            >
-              {isInCart(movie.id) ? "Added to Cart" : "Add to Cart"}
-            </button>
+          {/* Show Add to Cart only if logged in and not purchased */}
+          {!!firebaseUser && (
+            isPurchased(movie) ? (
+              <button disabled className="cart-button added">
+                Purchased
+              </button>
+            ) : isInCart(movie.id) ? (
+              <button disabled className="cart-button added">
+                Added to Cart
+              </button>
+            ) : (
+              <button
+                className="cart-button"
+                onClick={handleAddToCart}
+              >
+                Add to Cart
+              </button>
+            )
           )}
 
           {trailerKey && (

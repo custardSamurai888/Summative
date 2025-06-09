@@ -20,10 +20,14 @@ export const CartProvider = ({ children }) => {
     setCart((prev) => prev.filter((movie) => movie.id !== id));
   };
 
+  // Clear the cart (for logout or manual clearing)
   const clearCart = () => setCart([]);
 
+  // Check if a movie is in the cart
+  const isInCart = (id) => cart.some((movie) => movie.id === id);
+
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, isInCart }}>
       {children}
     </CartContext.Provider>
   );

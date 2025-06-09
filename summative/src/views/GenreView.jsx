@@ -8,14 +8,20 @@ import axios from "axios";
 import { CartContext } from "../context/CartContext";
 import { UserContext } from "../context/UserContext";
 
-
 const GenreView = () => {
-  const { user } = useContext(UserContext);
+  const { firebaseUser, purchases } = useContext(UserContext);
   const { id } = useParams();
   const [movies, setMovies] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const { addToCart, removeFromCart, isInCart } = useContext(CartContext);
+  const { addToCart, isInCart } = useContext(CartContext);
+
+  // Helper to check if purchased (by title and release_date)
+  const isPurchased = (movie) =>
+    purchases &&
+    purchases.some(
+      (p) => p.title === movie.title && p.release_date === movie.release_date
+    );
 
   useEffect(() => {
     const fetchMoviesByGenre = async () => {
@@ -72,8 +78,12 @@ const GenreView = () => {
                     <strong>{movie.title}</strong>
                   </p>
                 </Link>
-                {user.loggedIn &&
-                  (isInCart(movie.id) ? (
+                {!!firebaseUser &&
+                  (isPurchased(movie) ? (
+                    <button disabled className="cart-button added">
+                      Purchased
+                    </button>
+                  ) : isInCart(movie.id) ? (
                     <button disabled className="cart-button added">
                       Added to Cart
                     </button>

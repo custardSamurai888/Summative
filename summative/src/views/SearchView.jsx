@@ -1,4 +1,3 @@
-// src/views/SearchView.jsx
 import React, { useEffect, useState, useContext } from "react";
 import { useLocation, Link } from "react-router-dom";
 import axios from "axios";
@@ -18,26 +17,19 @@ const SearchView = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { addToCart, isInCart } = useContext(CartContext);
-  const { user } = useContext(UserContext);
+  const { firebaseUser, purchases } = useContext(UserContext);
+
+  // Helper to check if purchased (by title and release_date)
+  const isPurchased = (movie) =>
+    purchases &&
+    purchases.some(
+      (p) => p.title === movie.title && p.release_date === movie.release_date
+    );
 
   useEffect(() => {
     if (!query || query.trim() === "") {
-      return (
-        <div className="search-view">
-          <Header />
-          <div className="main-layout">
-            <aside className="sidebar">
-              <Genres />
-            </aside>
-            <div className="content-area">
-              <p className="error">Please enter a valid search query.</p>
-            </div>
-          </div>
-          <Footer />
-        </div>
-      );
+      return;
     }
-    
 
     const fetchResults = async () => {
       try {
@@ -109,9 +101,13 @@ const SearchView = () => {
                     <p><strong>{movie.title || "Untitled"}</strong></p>
                   </Link>
 
-                  {/* Add to Cart only if user is logged in */}
-                  {user?.loggedIn && (
-                    isInCart(movie.id) ? (
+                  {/* Add to Cart only if user is logged in and not purchased */}
+                  {!!firebaseUser && (
+                    isPurchased(movie) ? (
+                      <button disabled className="cart-button added">
+                        Purchased
+                      </button>
+                    ) : isInCart(movie.id) ? (
                       <button disabled className="cart-button added">
                         Added to Cart
                       </button>

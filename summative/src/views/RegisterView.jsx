@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./RegisterView.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { auth, firestore } from "../firebase/firebaseConfig";
 
 const RegisterView = () => {
@@ -21,10 +21,21 @@ const RegisterView = () => {
   const [googleUid, setGoogleUid] = useState(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const allowedGenreIds = [
     28, 80, 36, 878, 12, 10751, 27, 10752, 16, 14, 9648, 37,
   ];
+
+  // Pre-fill from location.state if present
+  useEffect(() => {
+    if (location.state) {
+      setEmail(location.state.email || "");
+      setFirstName(location.state.firstName || "");
+      setLastName(location.state.lastName || "");
+      setGoogleUid(location.state.googleUid || null);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const fetchGenres = async () => {
@@ -55,16 +66,15 @@ const RegisterView = () => {
     );
   };
 
-  const getSelectedGenreNames = () => {
-    return genres
-      .filter((g) => selectedGenres.includes(g.id))
-      .map((g) => g.name);
-  };
-
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (!firstName || !lastName || !email || (!googleUid && (!password || !rePassword))) {
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      (!googleUid && (!password || !rePassword))
+    ) {
       alert("All fields are required.");
       return;
     }
@@ -83,10 +93,8 @@ const RegisterView = () => {
       let uid;
 
       if (googleUid) {
-        // Already authenticated via Google
         uid = googleUid;
       } else {
-        // Email registration
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
@@ -95,28 +103,33 @@ const RegisterView = () => {
         uid = userCredential.user.uid;
       }
 
+      // Map selected IDs to objects with id and name
+      const selectedGenreObjects = genres
+        .filter((g) => selectedGenres.includes(g.id))
+        .map((g) => ({ id: g.id, name: g.name }));
+
       await setDoc(doc(firestore, "users", uid), {
         email,
         firstName,
         lastName,
-        genrePreferences: getSelectedGenreNames(),
+        genrePreferences: selectedGenreObjects,
         purchases: [],
         createdAt: new Date(),
       });
 
       alert("Registration successful!");
 
-      if (selectedGenres.length > 0) {
-        navigate(`/genre/${selectedGenres[0]}`);
+      if (selectedGenreObjects.length > 0) {
+        navigate(`/genre/${selectedGenreObjects[0].id}`);
       } else {
         navigate("/");
       }
     } catch (err) {
       console.error("Registration failed:", err);
       if (err.code === "auth/email-already-in-use") {
-        alert("This email is already registered.");
+        alert("Email already in use.");
       } else {
-        alert("Something went wrong: " + err.message);
+        alert("Registration failed: " + err.message);
       }
     }
   };
@@ -134,8 +147,7 @@ const RegisterView = () => {
       setFirstName(first);
       setLastName(last);
       setEmail(user.email);
-      setGoogleUid(user.uid); // Mark user as Google-authenticated
-
+      setGoogleUid(user.uid);
       alert("Google account linked! Complete the form to finish registration.");
     } catch (err) {
       console.error("Google sign-in failed:", err);

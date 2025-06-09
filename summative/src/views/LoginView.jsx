@@ -1,6 +1,5 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import './LoginView.css';
-import { UserContext } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import {
   signInWithEmailAndPassword,
@@ -8,12 +7,11 @@ import {
   GoogleAuthProvider
 } from 'firebase/auth';
 import { auth, firestore } from '../firebase/firebaseConfig';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 
 const LoginView = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useContext(UserContext);
   const navigate = useNavigate();
 
   const fetchUserInfo = async (uid) => {
@@ -39,7 +37,7 @@ const LoginView = () => {
         return;
       }
 
-      login(userData);
+      // No need to call login() - context will update automatically
       navigate('/');
     } catch (err) {
       console.error("Login error:", err);
@@ -58,25 +56,35 @@ const LoginView = () => {
       const user = result.user;
 
       const userRef = doc(firestore, "users", user.uid);
-      let userData;
-
       const userSnap = await getDoc(userRef);
+
       if (!userSnap.exists()) {
-        // Auto-register Google user
-        userData = {
-          email: user.email,
-          firstName: "",
-          lastName: "",
-          genrePreferences: [],
-          purchases: [],
-          createdAt: new Date()
-        };
-        await setDoc(userRef, userData);
-      } else {
-        userData = userSnap.data();
+        // Extract first and last name from displayName or email
+        let first = "";
+        let last = "";
+        if (user.displayName) {
+          const nameParts = user.displayName.split(" ");
+          first = nameParts[0] || "";
+          last = nameParts.slice(1).join(" ") || "";
+        } else if (user.email) {
+          const emailName = user.email.split("@")[0];
+          const nameParts = emailName.split(/[._]/); // split on . or _
+          first = nameParts[0] || "";
+          last = nameParts.slice(1).join(" ") || "";
+        }
+        // Redirect to register with pre-filled info
+        navigate("/register", {
+          state: {
+            email: user.email,
+            firstName: first,
+            lastName: last,
+            googleUid: user.uid,
+          },
+        });
+        return;
       }
 
-      login({ id: user.uid, ...userData });
+      // No need to call login() - context will update automatically
       navigate('/');
     } catch (err) {
       console.error("Google Sign-In Error:", err);

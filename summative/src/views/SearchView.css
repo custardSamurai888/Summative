@@ -23,7 +23,7 @@
 .content-area h2 {
   margin-bottom: 1rem;
   font-size: 1.5rem;
-  color: #eee;
+  color: #111;
 }
 
 .movie-cards {
@@ -72,7 +72,7 @@
   margin-bottom: 0.5rem;
 }
 
-/* Optional: basic search bar styling if it's inside Header */
+/* Search bar styling */
 .search-bar input {
   padding: 0.5rem 1rem;
   border: none;
@@ -80,11 +80,54 @@
   font-size: 1rem;
   width: 250px;
   max-width: 100%;
+  background: #222;
+  color: #fff;
+  transition: box-shadow 0.2s;
 }
 
 .search-bar input:focus {
   outline: none;
-  box-shadow: 0 0 5px #0f0;
+  box-shadow: 0 0 5px #ff9800;
+}
+
+/* Suggestions dropdown styling */
+.suggestions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0 0;
+  background: #232323;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  max-height: 260px;
+  overflow-y: auto;
+  position: absolute;
+  width: 250px;
+  z-index: 10;
+}
+
+.suggestions-list li {
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  color: #fff;
+  transition: background 0.15s;
+  border-bottom: 1px solid #292929;
+}
+
+.suggestions-list li:last-child {
+  border-bottom: none;
+}
+
+.suggestions-list li:hover,
+.suggestions-list li.active {
+  background: #ff9800;
+  color: #222;
+}
+
+/* Remove bullets from all ul/ol in search view */
+ul, ol, .suggestions-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
 }
 
 .pagination-controls {

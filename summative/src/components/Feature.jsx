@@ -1,4 +1,3 @@
-// src/components/Feature.jsx
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -9,7 +8,14 @@ import { UserContext } from '../context/UserContext';
 const Feature = () => {
   const [movies, setMovies] = useState([]);
   const { addToCart, isInCart } = useContext(CartContext);
-  const { user } = useContext(UserContext);
+  const { firebaseUser, purchases } = useContext(UserContext);
+
+  // Helper to check if purchased (by title and release_date)
+  const isPurchased = (movie) =>
+    purchases &&
+    purchases.some(
+      (p) => p.title === movie.title && p.release_date === movie.release_date
+    );
 
   useEffect(() => {
     const fetchNowPlaying = async () => {
@@ -24,7 +30,12 @@ const Feature = () => {
             },
           }
         );
-        setMovies(response.data.results.slice(0, 3));
+        // Randomize the movies and pick 3
+        const shuffled = response.data.results
+          .slice()
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 3);
+        setMovies(shuffled);
       } catch (err) {
         console.error('Failed to fetch now playing movies:', err);
       }
@@ -47,9 +58,13 @@ const Feature = () => {
               <p><strong>{movie.title}</strong></p>
             </Link>
 
-            {/* Only show Add to Cart if logged in */}
-            {user?.loggedIn && (
-              isInCart(movie.id) ? (
+            {/* Only show Add to Cart if logged in and not purchased */}
+            {!!firebaseUser && (
+              isPurchased(movie) ? (
+                <button disabled className="cart-button added">
+                  Purchased
+                </button>
+              ) : isInCart(movie.id) ? (
                 <button disabled className="cart-button added">
                   Added to Cart
                 </button>

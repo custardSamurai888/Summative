@@ -5,9 +5,9 @@ import { Link, useParams } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
 
 const Genres = () => {
-  const [genres, setGenres] = useState([]);
+  const [genresList, setGenresList] = useState([]);
   const { id: selectedGenreId } = useParams();
-  const { user } = useContext(UserContext);
+  const { firebaseUser, genres } = useContext(UserContext);
 
   useEffect(() => {
     const fetchGenres = async () => {
@@ -19,35 +19,44 @@ const Genres = () => {
           },
         });
 
-        // Filter only genres user selected at registration
-        const filtered = res.data.genres.filter((genre) =>
-          user.genres.includes(genre.id)
+        // genres is now array of {id, name}
+        const userGenreIds = (genres || []).map(g =>
+          typeof g === "object" && g !== null ? g.id : g
         );
 
-        setGenres(filtered);
+        const filtered = res.data.genres.filter((genre) =>
+          userGenreIds.includes(genre.id)
+        );
+
+        setGenresList(filtered);
       } catch (err) {
         console.error('Genre API error:', err);
+        setGenresList([]);
       }
     };
 
     fetchGenres();
-  }, [user.genres]); // Refetch if user.genres changes
+  }, [genres]);
 
   return (
     <div className="genres">
       <h3>Your Selected Genres</h3>
-      <ul>
-        {genres.map((genre) => (
-          <li key={genre.id}>
-            <Link
-              to={`/genre/${genre.id}`}
-              className={selectedGenreId === String(genre.id) ? 'active-genre' : ''}
-            >
-              {genre.name}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {genresList.length === 0 ? (
+        <p>No genres selected. Please register and select your favorite genres.</p>
+      ) : (
+        <ul>
+          {genresList.map((genre) => (
+            <li key={genre.id}>
+              <Link
+                to={`/genre/${genre.id}`}
+                className={selectedGenreId === String(genre.id) ? 'active-genre' : ''}
+              >
+                {genre.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

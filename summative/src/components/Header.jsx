@@ -7,7 +7,7 @@ import axios from "axios";
 
 const Header = () => {
   const navigate = useNavigate();
-  const { user, logout } = useContext(UserContext);
+  const { firebaseUser, genres, logout } = useContext(UserContext);
   const { cart } = useContext(CartContext);
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -69,11 +69,11 @@ const Header = () => {
   }, []);
 
   const getGreetingName = () => {
-    if (user.firstName && user.firstName.trim() !== "") {
-      return user.firstName;
+    if (firebaseUser?.displayName && firebaseUser.displayName.trim() !== "") {
+      return firebaseUser.displayName.split(" ")[0];
     }
-    if (user.email) {
-      return user.email.split("@")[0];
+    if (firebaseUser?.email) {
+      return firebaseUser.email.split("@")[0];
     }
     return "User";
   };
@@ -84,7 +84,7 @@ const Header = () => {
         <img className="logo" src="/images/hmm.png" alt="Logo" />
       </Link>
 
-      {user.loggedIn && (
+      {!!firebaseUser && (
         <>
           <h1 className="welcome-heading">Hello, {getGreetingName()}!</h1>
 
@@ -120,7 +120,7 @@ const Header = () => {
       )}
 
       <div className="header-buttons">
-        {user.loggedIn ? (
+        {!!firebaseUser ? (
           <>
             <button onClick={() => navigate("/cart")}>
               Cart{" "}

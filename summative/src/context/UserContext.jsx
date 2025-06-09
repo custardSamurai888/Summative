@@ -1,82 +1,77 @@
-import { createContext, useState } from "react";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { saveUserToFirestore } from "../firebase/firestoreUtils";  // Adjust path
+import { createContext, useState, useEffect, useContext } from "react";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { firestore } from "../firebase/firebaseConfig";
+import { CartContext } from "./CartContext";
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    username: "",
-    genres: [],
-    loggedIn: false,
-  });
-
+  // Store only Firebase user object, genre preferences, and purchases
+  const [firebaseUser, setFirebaseUser] = useState(null);
+  const [genres, setGenres] = useState([]);
+  const [purchases, setPurchases] = useState([]);
   const auth = getAuth();
+  const { clearCart } = useContext(CartContext);
 
-  const login = (username) => {
-    setUser((prev) => ({
-      ...prev,
-      username,
-      loggedIn: true,
-    }));
-  };
-
-  const logout = () => {
-    setUser({
-      firstName: "",
-      lastName: "",
-      email: "",
-      username: "",
-      genres: [],
-      loggedIn: false,
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setFirebaseUser(user);
+        const userDoc = await getDoc(doc(firestore, "users", user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          setGenres(data.genrePreferences || []);
+          setPurchases(data.purchases || []);
+        } else {
+          setGenres([]);
+          setPurchases([]);
+        }
+      } else {
+        setFirebaseUser(null);
+        setGenres([]);
+        setPurchases([]);
+      }
     });
+    return () => unsubscribe();
+  }, [auth]);
+
+  const logout = async () => {
+    await signOut(auth);
+    setFirebaseUser(null);
+    setGenres([]);
+    setPurchases([]);
+    clearCart();
   };
 
-  // Updated register function to handle Firebase Auth + Firestore save
-  const register = async ({
-    firstName,
-    lastName,
-    email,
-    password,
-    genres,
-  }) => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const firebaseUser = userCredential.user;
+  // Update genres in context and Firestore
+  const updateGenres = async (newGenres) => {
+    if (!firebaseUser) return;
+    await updateDoc(doc(firestore, "users", firebaseUser.uid), { genrePreferences: newGenres });
+    setGenres(newGenres);
+  };
 
-      // Save additional user info to Firestore
-      await saveUserToFirestore(firebaseUser.uid, {
-        firstName,
-        lastName,
-        email,
-        username: email.split("@")[0],
-        preferredGenres: genres,
-      });
-
-      // Update context state
-      setUser({
-        firstName,
-        lastName,
-        email,
-        username: email.split("@")[0],
-        genres,
-        loggedIn: true,
-      });
-    } catch (error) {
-      console.error("Registration error:", error);
-      alert(error.message);
-    }
+  // Update purchases in context and Firestore
+  const updatePurchases = async (newPurchases) => {
+    if (!firebaseUser) return;
+    await updateDoc(doc(firestore, "users", firebaseUser.uid), { purchases: newPurchases });
+    setPurchases(newPurchases);
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, login, logout, register }}>
+    <UserContext.Provider
+      value={{
+        firebaseUser,      // Use !!firebaseUser to check login status
+        genres,            // Use genres directly
+        purchases,         // Use purchases directly
+        setFirebaseUser,
+        setGenres,
+        setPurchases,
+        logout,
+        updateGenres,
+        updatePurchases,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
