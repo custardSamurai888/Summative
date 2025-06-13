@@ -1,18 +1,16 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { firestore } from "../firebase/firebaseConfig";
-import { CartContext } from "./CartContext";
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  // Store only Firebase user object, genre preferences, and purchases
   const [firebaseUser, setFirebaseUser] = useState(null);
   const [genres, setGenres] = useState([]);
   const [purchases, setPurchases] = useState([]);
+  const [loading, setLoading] = useState(true); // <-- add loading state
   const auth = getAuth();
-  const { clearCart } = useContext(CartContext);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -32,6 +30,7 @@ export const UserProvider = ({ children }) => {
         setGenres([]);
         setPurchases([]);
       }
+      setLoading(false); // <-- set loading to false after check
     });
     return () => unsubscribe();
   }, [auth]);
@@ -41,29 +40,28 @@ export const UserProvider = ({ children }) => {
     setFirebaseUser(null);
     setGenres([]);
     setPurchases([]);
-    clearCart();
   };
 
-  // Update genres in context and Firestore
   const updateGenres = async (newGenres) => {
     if (!firebaseUser) return;
     await updateDoc(doc(firestore, "users", firebaseUser.uid), { genrePreferences: newGenres });
     setGenres(newGenres);
   };
 
-  // Update purchases in context and Firestore
   const updatePurchases = async (newPurchases) => {
     if (!firebaseUser) return;
     await updateDoc(doc(firestore, "users", firebaseUser.uid), { purchases: newPurchases });
     setPurchases(newPurchases);
   };
 
+  if (loading) return <div style={{color: "#fff", textAlign: "center", marginTop: "3rem"}}>Loading...</div>;
+
   return (
     <UserContext.Provider
       value={{
-        firebaseUser,      // Use !!firebaseUser to check login status
-        genres,            // Use genres directly
-        purchases,         // Use purchases directly
+        firebaseUser,
+        genres,
+        purchases,
         setFirebaseUser,
         setGenres,
         setPurchases,

@@ -15,8 +15,8 @@ import PrivateRoute from './components/PrivateRoute';
 
 function App() {
   return (
-    <CartProvider>
-      <UserProvider>
+    <UserProvider>
+      <CartProvider>
         <Router>
           <Routes>
             <Route path="/" element={<HomeView />} />
@@ -65,8 +65,8 @@ function App() {
             <Route path="*" element={<ErrorView />} />
           </Routes>
         </Router>
-      </UserProvider>
-    </CartProvider>
+      </CartProvider>
+    </UserProvider>
   );
 }
 

@@ -3,19 +3,19 @@ import './SettingsView.css';
 import { UserContext } from '../context/UserContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { firestore } from '../firebase/firebaseConfig';
 import { getAuth, updateProfile, updatePassword } from "firebase/auth";
 
 const SettingsView = () => {
   const { firebaseUser, genres, purchases, updateGenres } = useContext(UserContext);
-  const [firstName, setFirstName] = useState(firebaseUser?.displayName?.split(" ")[0] || "");
-  const [lastName, setLastName] = useState(firebaseUser?.displayName?.split(" ")[1] || "");
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [selectedGenres, setSelectedGenres] = useState(
     (genres || []).map(g => (typeof g === "object" && g !== null ? g.id : g))
   );
   const [allGenres, setAllGenres] = useState([]);
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
 
   const navigate = useNavigate();
@@ -23,6 +23,25 @@ const SettingsView = () => {
 
   // Check if user is email/password
   const isEmailPasswordUser = firebaseUser?.providerData?.[0]?.providerId === "password";
+
+  // Fetch Firestore user info for first/last name
+  useEffect(() => {
+    const fetchUserNames = async () => {
+      if (firebaseUser) {
+        const userDoc = await getDoc(doc(firestore, "users", firebaseUser.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          setFirstName(data.firstName || firebaseUser.displayName?.split(" ")[0] || "");
+          setLastName(data.lastName || firebaseUser.displayName?.split(" ")[1] || "");
+        } else {
+          setFirstName(firebaseUser.displayName?.split(" ")[0] || "");
+          setLastName(firebaseUser.displayName?.split(" ")[1] || "");
+        }
+      }
+    };
+    fetchUserNames();
+    // eslint-disable-next-line
+  }, [firebaseUser]);
 
   useEffect(() => {
     const fetchGenres = async () => {
@@ -127,7 +146,8 @@ const SettingsView = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="New Password"
+              placeholder="New Password (leave blank to keep current)"
+              autoComplete="new-password"
             />
           </>
         )}
